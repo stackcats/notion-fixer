@@ -1,0 +1,32 @@
+name: Sync currency rates to Notion using Fixer.io
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: "*/15 * * * *"
+
+jobs:
+  build:
+    name: Update currency rates
+    runs-on: ubuntu-latest
+    env:
+      FIXER_ACCESS_KEY: ${{ secrets.FIXER_ACCESS_KEY }}
+      NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+    steps:
+      - name: Go env
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.17
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Run
+        run: go run ./cmd/rates/main.go
